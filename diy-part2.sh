@@ -10,13 +10,19 @@
 # See /LICENSE for more information.
 #
 
-# 1. 删除 OpenWrt feeds 自带的核心库，避免和 PassWall 官方源冲突
+# ===== 1. 替换 PassWall 相关旧包 =====
 rm -rf feeds/packages/net/{xray-core,v2ray-geodata,sing-box,chinadns-ng,dns2socks,hysteria,ipt2socks,microsocks,naiveproxy,shadowsocks-rust,shadowsocksr-libev,simple-obfs,tcping,v2ray-plugin,xray-plugin,geoview,shadow-tls}
 
-# 2. 删除 openwrt feeds 过时的 luci-app-passwall
-rm -rf feeds/luci/applications/luci-app-passwall
+# 核心依赖库：无 tag，固定 commit c1c015e
+git clone https://github.com/Openwrt-Passwall/openwrt-passwall-packages package/passwall-packages
+cd package/passwall-packages && git checkout c1c015e && cd ../..
 
-# 3. 替换 golang（新版 Xray-core 要求 Go 1.23+）
+# LuCI 界面：固定 tag 26.5.3-1
+rm -rf feeds/luci/applications/luci-app-passwall
+git clone https://github.com/Openwrt-Passwall/openwrt-passwall package/passwall-luci
+cd package/passwall-luci && git checkout 26.5.3-1 && cd ../..
+
+# ===== 2. 替换 Go 工具链 =====
 rm -rf feeds/packages/lang/golang
 git clone https://github.com/sbwml/packages_lang_golang -b 27.x feeds/packages/lang/golang
 
