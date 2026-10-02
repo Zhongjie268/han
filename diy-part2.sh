@@ -10,30 +10,25 @@
 # See /LICENSE for more information.
 #
 
-# Modify default IP
-#sed -i 's/192.168.1.1/192.168.50.5/g' package/base-files/files/bin/config_generate
+# 1. 删除会和 kenzok8 small 源冲突的上游包
+rm -rf feeds/luci/applications/luci-app-mosdns
+rm -rf feeds/packages/net/{alist,adguardhome,mosdns,xray*,v2ray*,sing*,smartdns}
+rm -rf feeds/packages/utils/v2dat
 
-# Modify default theme
-#sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
-
-# Modify hostname
-#sed -i 's/OpenWrt/P3TERX-Router/g' package/base-files/files/bin/config_generate
-
-sed -i 's/ImmortalWrt-2.4G/666999/g' package/mtk/applications/mtwifi-cfg/files/mtwifi.sh
-sed -i 's/ImmortalWrt-5G/666999_/g' package/mtk/applications/mtwifi-cfg/files/mtwifi.sh
-
-sed -i 's/encryption=none/encryption=psk2/' package/mtk/applications/mtwifi-cfg/files/mtwifi.sh
-sed -i "/encryption=psk2/a\\\t\t\t\t\tset wireless.default_\${dev}.key=huiyin268" package/mtk/applications/mtwifi-cfg/files/mtwifi.sh
-
+# 2. 替换 golang（用 sbwml 的 27.x）
 rm -rf feeds/packages/lang/golang
 git clone https://github.com/sbwml/packages_lang_golang -b 27.x feeds/packages/lang/golang
 
-# ===== 添加 iptables-mod-socket 补丁 =====
-PATCH_DIR="target/linux/mediatek/patches-5.4"
-mkdir -p "$PATCH_DIR"
+# 3. 修改 MTK Wi-Fi 默认 SSID 和密码
+sed -i 's/ImmortalWrt-2.4G/666999/g' package/mtk/applications/mtwifi-cfg/files/mtwifi.sh
+sed -i 's/ImmortalWrt-5G/666999_/g' package/mtk/applications/mtwifi-cfg/files/mtwifi.sh
+sed -i 's/encryption=none/encryption=psk2/' package/mtk/applications/mtwifi-cfg/files/mtwifi.sh
+sed -i "/encryption=psk2/a\\\t\t\t\t\tset wireless.default_\${dev}.key=huiyin268" package/mtk/applications/mtwifi-cfg/files/mtwifi.sh
+
+# 4. 应用 iptables-mod-socket 补丁
 if [ -f "$GITHUB_WORKSPACE/0001-Add-iptables-socket.patch" ]; then
-    cp "$GITHUB_WORKSPACE/0001-Add-iptables-socket.patch" "$PATCH_DIR/"
-    echo "iptables-mod-socket patch copied to $PATCH_DIR"
+    patch -p1 -N < "$GITHUB_WORKSPACE/0001-Add-iptables-socket.patch" || true
+    echo "iptables-mod-socket patch applied"
 else
     echo "WARNING: 0001-Add-iptables-socket.patch not found in $GITHUB_WORKSPACE"
 fi
