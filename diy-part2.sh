@@ -13,7 +13,7 @@
 # ===== 1. 替换 PassWall 相关旧包 =====
 rm -rf feeds/packages/net/{xray-core,v2ray-geodata,sing-box,chinadns-ng,dns2socks,hysteria,ipt2socks,microsocks,naiveproxy,shadowsocks-rust,shadowsocksr-libev,simple-obfs,tcping,v2ray-plugin,xray-plugin,geoview,shadow-tls}
 
-# 核心依赖库：无 tag，固定 commit c1c015e
+# 核心依赖库：固定 commit c1c015e
 git clone https://github.com/Openwrt-Passwall/openwrt-passwall-packages package/passwall-packages
 cd package/passwall-packages && git checkout c1c015e && cd ../..
 
